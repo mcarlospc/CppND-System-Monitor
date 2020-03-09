@@ -7,8 +7,8 @@ using std::vector;
 using std::string;
 
 // TODO: Return the aggregate CPU utilization
-float Processor::Utilization() { 
-  
+// https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux
+float Processor::Utilization() {
   vector<string> utilizations =LinuxParser::CpuUtilization();
   long user = stol(utilizations[0]);
   long nice = stol(utilizations[1]);
@@ -18,12 +18,19 @@ float Processor::Utilization() {
   long irq = stol(utilizations[5]);
   long softirq = stol(utilizations[6]);
   long steal = stol(utilizations[7]);
+
+
   long PrevIdle = _last_idle + _last_iowait;
   long Idle = idle + iowait;
-  long PrevNonIdle = _last_user + _last_nice + _last_system + _last_irq + _last_softirq + _last_steal;
-  long NonIdle = user + nice + system + irq + softirq + steal;
+  long PrevNonIdle = _last_user + _last_nice + _last_system + _last_irq +
+                     _last_softirq + _last_steal;
+  long NonIdle = user + nice + system + irq + softirq +
+                 steal;
+
   long PrevTotal = PrevIdle + PrevNonIdle ;
   long Total = Idle + NonIdle;
+
+  // differentiate: actual value minus the previous one
   float totald = Total - PrevTotal;
   float idled = Idle - PrevIdle;
 

@@ -6,6 +6,7 @@ class Processor {
   float Utilization();  // TODO: See src/processor.cpp
 
   // TODO: Declare any necessary private members
+  // https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux
  private:
   long _last_user;
   long _last_nice;

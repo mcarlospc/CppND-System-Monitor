@@ -113,17 +113,43 @@ long LinuxParser::UpTime() {
 }
 
 // TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+long LinuxParser::Jiffies() { return UpTime() * sysconf(_SC_CLK_TCK); }
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
+long LinuxParser::ActiveJiffies(int pid) { 
+  string line, token;
+  long total_jiffies{0};
+  long utime{0}, stime{0}, cutime{0}, cstime{0};
+  std::ifstream filestream(LinuxParser::kProcDirectory + to_string(pid) +
+                           LinuxParser::kStatFilename);
+  if (filestream.is_open()) {
+    for (int i = 0; filestream >> token; i++) {
+      if (i == 13) utime = stol(token);
+      if (i == 14) stime = stol(token);
+      if (i == 15) cutime = stol(token);
+      if (i == 16) cstime = stol(token);
+    }
+    total_jiffies = utime + stime + cutime + cstime;
+  }
+  return total_jiffies;
+}
 
 // TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+long LinuxParser::ActiveJiffies() { 
+  vector<string> cpu_time = CpuUtilization();
+  long active_jiffies = stol(cpu_time[CPUStates::kUser_]) + stol(cpu_time[CPUStates::kNice_]) + 
+                        stol(cpu_time[CPUStates::kSystem_]) + stol(cpu_time[CPUStates::kIdle_]) +
+                        stol(cpu_time[CPUStates::kIOwait_]) + stol(cpu_time[CPUStates::kIRQ_]) +
+                        stol(cpu_time[CPUStates::kSoftIRQ_]) + stol(cpu_time[CPUStates::kSteal_]);
+  return active_jiffies;
+}
 
 // TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+long LinuxParser::IdleJiffies() { 
+  vector<string> cpu_time = CpuUtilization();
+  return stol(cpu_time[CPUStates::kIdle_]) + stol(cpu_time[CPUStates::kIOwait_]);
+}
 
 // TODO: Read and return CPU utilization
 vector<string> LinuxParser::CpuUtilization() { 
