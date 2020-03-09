@@ -22,6 +22,8 @@ class System {
  private:
   Processor cpu_ = {};
   std::vector<Process> processes_ = {};
+  void UpdateProcess(int pid);
+  void UpdateProcesses();
 };
 
 #endif

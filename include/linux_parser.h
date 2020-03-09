@@ -17,6 +17,7 @@ const std::string kMeminfoFilename{"/meminfo"};
 const std::string kVersionFilename{"/version"};
 const std::string kOSPath{"/etc/os-release"};
 const std::string kPasswordPath{"/etc/passwd"};
+const std::string kStatCommandline{"/cmdline"};
 
 // System
 float MemoryUtilization();
@@ -26,6 +27,10 @@ int TotalProcesses();
 int RunningProcesses();
 std::string OperatingSystem();
 std::string Kernel();
+  
+// util
+std::string GetPropertyFromFile(std::string filePath, std::string propertyName);
+std::string GetPropertyFromFile(std::string filePath, unsigned long position);
 
 // CPU
 enum CPUStates {
@@ -40,6 +45,7 @@ enum CPUStates {
   kGuest_,
   kGuestNice_
 };
+float CpuUtilization(int pid);
 std::vector<std::string> CpuUtilization();
 long Jiffies();
 long ActiveJiffies();
